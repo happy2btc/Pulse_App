@@ -8,104 +8,105 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            background: #0f172a; 
-            color: white;
-            text-align: center;
-            padding: 2rem;
+            margin: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-start;
+            min-height: 100vh; background: #0f172a; color: white;
+            text-align: center; padding: 2rem;
         }
         .pulse-sphere {
-            width: 150px;
-            height: 150px;
+            width: 120px; height: 120px;
             background: radial-gradient(circle at 30% 30%, #2dd4bf, #0d9488);
-            border-radius: 50%;
-            box-shadow: 0 0 40px rgba(45, 212, 191, 0.4);
-            animation: pulse-animation 4s infinite ease-in-out;
-            margin: 2rem 0;
+            border-radius: 50%; box-shadow: 0 0 40px rgba(45, 212, 191, 0.4);
+            animation: pulse-animation 4s infinite ease-in-out; margin: 1rem 0;
         }
         @keyframes pulse-animation {
             0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(45, 212, 191, 0.7); }
+            50% { transform: scale(1.1); opacity: 1; }
             100% { transform: scale(1); opacity: 0.8; }
         }
-        h1 { font-size: 2rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
-        .subtitle { color: #94a3b8; font-style: italic; margin-bottom: 2rem; }
         .input-container {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%; max-width: 500px; background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
         }
         textarea {
-            width: 100%;
-            height: 100px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #2dd4bf;
-            border-radius: 10px;
-            color: white;
-            padding: 1rem;
-            font-size: 1rem;
-            resize: none;
-            box-sizing: border-box;
-            margin-bottom: 1.5rem;
-            outline: none;
+            width: 100%; height: 80px; background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2dd4bf; border-radius: 10px;
+            color: white; padding: 1rem; margin-bottom: 1rem; resize: none;
         }
         .send-button {
-            background: #14b8a6;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.3s;
+            background: #14b8a6; color: white; border: none;
+            padding: 10px 25px; border-radius: 30px; font-weight: bold; cursor: pointer;
         }
-        .send-button:hover { background: #2dd4bf; }
+        #pulseFeed { width: 100%; max-width: 500px; text-align: left; }
+        .pulse-card {
+            background: rgba(255, 255, 255, 0.03); padding: 1rem;
+            border-left: 4px solid #2dd4bf; margin-bottom: 10px; border-radius: 0 10px 10px 0;
+        }
+        .pulse-time { font-size: 0.7rem; color: #94a3b8; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="pulse-sphere"></div>
     <h1>COLLECTIVE PULSE</h1>
-    <p class="subtitle">Listening for the common thread.</p>
-
+    
     <div class="input-container">
-        <p>What is on your heart today?</p>
-        <textarea id="pulseInput" placeholder="Type your thoughts here..."></textarea>
-        <br>
+        <textarea id="pulseInput" placeholder="What's on your heart?"></textarea>
         <button class="send-button" onclick="sendPulse()">Send to the Pulse</button>
     </div>
+
+    <h3>Latest Heartbeats</h3>
+    <div id="pulseFeed">Loading pulses...</div>
 
     <script>
         const SUPABASE_URL = 'https://ehpjfhqwjmpevneyaqty.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_Z3OUyF9wFc0kEqllPdnqSQ_yRFjoqzp';
-
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        async function fetchPulses() {
+            const { data, error } = await supabaseClient
+                .from('pulse')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (error) {
+                console.error("Error fetching:", error);
+                return;
+            }
+
+            const feed = document.getElementById('pulseFeed');
+            feed.innerHTML = '';
+            data.forEach(pulse => {
+                const card = document.createElement('div');
+                card.className = 'pulse-card';
+                card.innerHTML = `
+                    <div>${pulse.content}</div>
+                    <div class="pulse-time">${new Date(pulse.created_at).toLocaleString()}</div>
+                `;
+                feed.appendChild(card);
+            });
+        }
 
         async function sendPulse() {
-            const content = document.getElementById('pulseInput').value;
-            if (!content) return alert("Please type something first!");
+            const pulseInput = document.getElementById('pulseInput');
+            const content = pulseInput.value;
+            if (!content) return;
 
-            const { data, error } = await supabaseClient
-                .from('pulses')
+            const { error } = await supabaseClient
+                .from('pulse')
                 .insert([{ content: content }]);
 
             if (error) {
-                console.error(error);
-                alert("Error sending pulse: " + error.message);
+                console.error("Error sending:", error);
             } else {
-                alert("Your thought has been added to the collective data!");
-                document.getElementById('pulseInput').value = ''; 
+                pulseInput.value = ''; 
+                fetchPulses(); // Refresh the feed immediately!
             }
         }
+
+        // This starts the heartbeat when the page opens
+        fetchPulses();
     </script>
 </body>
 </html>

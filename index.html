@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collective Pulse - Home</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background: #0f172a; 
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .pulse-sphere {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle at 30% 30%, #2dd4bf, #0d9488);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(45, 212, 191, 0.4);
+            animation: pulse-animation 4s infinite ease-in-out;
+            margin: 2rem 0;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(45, 212, 191, 0.7); }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        h1 { font-size: 2rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .subtitle { color: #94a3b8; font-style: italic; margin-bottom: 2rem; }
+
+        /* --- THE EXPRESSION WELL (Input Section) --- */
+        .input-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2dd4bf;
+            border-radius: 10px;
+            color: white;
+            padding: 1rem;
+            font-size: 1rem;
+            resize: none;
+            box-sizing: border-box;
+            margin-bottom: 1.5rem;
+            outline: none;
+        }
+
+        .send-button {
+            background: #14b8a6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .send-button:hover {
+            background: #2dd4bf;
+            box-shadow: 0 0 20px rgba(45, 212, 191, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pulse-sphere"></div>
+    <h1>COLLECTIVE PULSE</h1>
+    <p class="subtitle">Listening for the common thread.</p>
+
+    <div class="input-container">
+        <p>What is on your heart today?</p>
+        <textarea placeholder="Type your thoughts here..."></textarea>
+        <br>
+        <button class="send-button" onclick="alert('Your thought has been added to the collective data!')">Send to the Pulse</button>
+    </div>
+    </body>
+</html>
